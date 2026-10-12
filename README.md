@@ -1,7 +1,6 @@
 # infrastructure-hosted-large-rdf-bench
 
-Ansible that deploys the **LargeRDFBench Interoperable Edition**
-([Zenodo record 22140177](https://zenodo.org/records/22140177)) as 13 **QLever SPARQL endpoints**,
+Ansible that deploys the [**LargeRDFBench Interoperable Edition**](https://zenodo.org/records/22140177) as 13 **QLever SPARQL endpoints**,
 on one machine or spread over several.
 
 Each machine downloads `rdf_datasets.zip` (5.1 GB, md5-checked), extracts only the datasets it
