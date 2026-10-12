@@ -1,0 +1,65 @@
+# Build one endpoint's QLever index from its RDF file (once), then serve it on
+# its port in a detached container.
+- name: "[{{ ep.key }}] Check whether the QLever index already exists"
+  ansible.builtin.stat:
+    path: "{{ data_dir }}/{{ ep.key }}/{{ ep.key }}.index.spo"
+  register: qlever_index
+
+- name: "[{{ ep.key }}] Build the QLever index"
+  community.docker.docker_container:
+    name: "qlever-index-{{ ep.key }}"
+    image: "{{ qlever_image }}"
+    user: "{{ ansible_user_uid }}:{{ ansible_user_gid }}"
+    entrypoint: [qlever-index]
+    command:
+      - -i
+      - "{{ ep.key }}"
+      - -f
+      - "{{ rdf_files[ep.key] }}"
+      - -m
+      - "{{ ep.value.index_memory }}"
+    volumes:
+      - "{{ data_dir }}/{{ ep.key }}:/data"
+    working_dir: /data
+    detach: false
+    cleanup: true
+  when: not qlever_index.stat.exists
+
+- name: "[{{ ep.key }}] Serve the QLever index"
+  community.docker.docker_container:
+    name: "qlever-{{ ep.key }}"
+    image: "{{ qlever_image }}"
+    restart_policy: unless-stopped
+    user: "{{ ansible_user_uid }}:{{ ansible_user_gid }}"
+    entrypoint: [qlever-server]
+    command:
+      - -i
+      - "{{ ep.key }}"
+      - -p
+      - "{{ ep.value.port }}"
+      - -m
+      - "{{ ep.value.memory }}"
+      - -c
+      - "{{ ep.value.cache }}"
+      - -s
+      - "{{ ep.value.timeout }}"
+    volumes:
+      - "{{ data_dir }}/{{ ep.key }}:/data"
+    working_dir: /data
+    published_ports:
+      - "{{ ep.value.port }}:{{ ep.value.port }}"
+
+- name: "[{{ ep.key }}] Wait for the endpoint to listen"
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ ep.value.port }}"
+    timeout: 300
+
+- name: "[{{ ep.key }}] Verify it answers ASK at /sparql"
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ ep.value.port }}/sparql?query=ASK%7B%3Fs%20%3Fp%20%3Fo%7D"
+    headers:
+      Accept: application/sparql-results+json
+    return_content: true
+  register: ask
+  failed_when: "'true' not in ask.content"

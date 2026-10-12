@@ -1,0 +1,25 @@
+# =============================================================================
+# Which dataset runs where, and how. `host` must match a host name in
+# inventory.yml, which defines the machine. Ports are unique, so any packing
+# works: spread endpoints by pointing them at different hosts.
+#
+#   memory         qlever-server -m
+#   cache          qlever-server -c
+#   timeout        qlever-server -s
+#   index_memory   qlever-index -m
+# =============================================================================
+
+sparql_endpoints:
+  Affymetrix:     { host: node-1, port: 3002, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  ChEBI:          { host: node-1, port: 3003, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  DBPedia-Subset: { host: node-1, port: 3004, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  DrugBank:       { host: node-1, port: 3005, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  GeoNames:       { host: node-1, port: 3006, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  Jamendo:        { host: node-1, port: 3007, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  KEGG:           { host: node-1, port: 3008, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  LinkedTCGA-A:   { host: node-1, port: 3009, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  LinkedTCGA-E:   { host: node-1, port: 3010, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  LinkedTCGA-M:   { host: node-1, port: 3011, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  LMDB:           { host: node-1, port: 3012, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  NYT:            { host: node-1, port: 3013, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }
+  SWDFood:        { host: node-1, port: 3014, memory: 16G, cache: 4G, timeout: 1800s, index_memory: 12G }

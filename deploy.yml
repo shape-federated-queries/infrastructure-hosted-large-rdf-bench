@@ -1,0 +1,30 @@
+# Deploy the QLever SPARQL endpoints listed in sparql-endpoints.yml, each on
+# the machine named by its `host`. Run with `make deploy`.
+- name: Deploy the QLever SPARQL endpoints
+  hosts: qlever
+  gather_facts: true
+  tasks:
+    - name: Select the endpoints served by this machine
+      ansible.builtin.set_fact:
+        my_endpoints: "{{ sparql_endpoints | dict2items | selectattr('value.host', '==', inventory_hostname) | list }}"
+
+    - name: System setup and base dependencies
+      ansible.builtin.include_tasks: tasks/system.yml
+
+    - name: Install Docker
+      ansible.builtin.include_tasks: tasks/docker.yml
+
+    - name: Pull the QLever image
+      community.docker.docker_image:
+        name: "{{ qlever_image }}"
+        source: pull
+        force_source: true
+
+    - name: Download and extract this machine's datasets
+      ansible.builtin.include_tasks: tasks/download.yml
+
+    - name: Index and serve each endpoint
+      ansible.builtin.include_tasks: tasks/start_qlever.yml
+      loop: "{{ my_endpoints }}"
+      loop_control:
+        loop_var: ep

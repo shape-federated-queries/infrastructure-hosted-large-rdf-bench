@@ -1,0 +1,4 @@
+# Ansible collections this repo depends on. Installed by `make deps`.
+collections:
+  - name: community.docker
+    version: ">=5.0.0"

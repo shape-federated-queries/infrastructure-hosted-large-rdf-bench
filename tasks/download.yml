@@ -1,0 +1,37 @@
+# Download the Zenodo zip and extract only the datasets this host serves, each
+# into its own directory under data_dir. Expects `my_endpoints` (this host's
+# entries of `sparql_endpoints`, as dict2items) from deploy.yml.
+- name: Create one directory per dataset (and data_dir itself)
+  ansible.builtin.file:
+    path: "{{ data_dir }}/{{ ep.key }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ my_endpoints }}"
+  loop_control:
+    loop_var: ep
+
+- name: Check which of this host's RDF files are already extracted
+  ansible.builtin.stat:
+    path: "{{ data_dir }}/{{ ep.key }}/{{ rdf_files[ep.key] }}"
+  loop: "{{ my_endpoints }}"
+  loop_control:
+    loop_var: ep
+  register: rdf_stat
+
+- name: Download the dataset zip from Zenodo
+  ansible.builtin.get_url:
+    url: "{{ zenodo_zip_url }}"
+    dest: "{{ data_dir }}/rdf_datasets.zip"
+    checksum: "md5:{{ zenodo_zip_md5 }}"
+    mode: "0644"
+  when: rdf_stat.results | rejectattr('stat.exists') | list | length > 0
+
+- name: Extract each dataset's RDF file
+  ansible.builtin.command:
+    cmd: >
+      unzip -o -j {{ data_dir }}/rdf_datasets.zip {{ rdf_files[ep.key] }}
+      -d {{ data_dir }}/{{ ep.key }}
+    creates: "{{ data_dir }}/{{ ep.key }}/{{ rdf_files[ep.key] }}"
+  loop: "{{ my_endpoints }}"
+  loop_control:
+    loop_var: ep

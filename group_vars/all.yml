@@ -1,0 +1,30 @@
+# =============================================================================
+# Global settings for the QLever endpoint playbook. Task files under tasks/
+# reference these variables only -- no literals.
+#
+# Everything per endpoint (machine, port, memory, cache, timeout) lives in
+# sparql-endpoints.yml, loaded with `-e @sparql-endpoints.yml`.
+# =============================================================================
+
+# --- Data (LargeRDFBench Interoperable Edition, Zenodo record 22140177) -------
+zenodo_zip_url: https://zenodo.org/api/records/22140177/files/rdf_datasets.zip/content
+zenodo_zip_md5: d3b1dcedf94af4114d7a75f8f0fa141b
+data_dir: "{{ ansible_env.HOME }}/data"
+# Zip member for each dataset (flat at the zip root; extensions differ).
+rdf_files:
+  Affymetrix: Affymetrix.nt
+  ChEBI: ChEBI.ttl
+  DBPedia-Subset: DBPedia-Subset.nt
+  DrugBank: DrugBank.nt
+  GeoNames: GeoNames.ttl
+  Jamendo: Jamendo.nt
+  KEGG: KEGG.ttl
+  LinkedTCGA-A: LinkedTCGA-A.ttl
+  LinkedTCGA-E: LinkedTCGA-E.ttl
+  LinkedTCGA-M: LinkedTCGA-M.ttl
+  LMDB: LMDB.nt
+  NYT: NYT.nt
+  SWDFood: SWDFood.nt
+
+# --- QLever ------------------------------------------------------------------
+qlever_image: adfreiburg/qlever

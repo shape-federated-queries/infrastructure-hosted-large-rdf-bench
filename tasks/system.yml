@@ -1,0 +1,16 @@
+- name: Update apt cache and upgrade packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: dist
+  become: true
+
+- name: Install base tooling
+  ansible.builtin.apt:
+    name:
+      - curl
+      - unzip             # extract this host's datasets from the Zenodo zip
+      - ca-certificates
+      - python3-requests  # needed by the community.docker modules
+    state: present
+    update_cache: true
+  become: true
